@@ -38,7 +38,6 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'workatolist.urls'
 
 TEMPLATES = [
     {
@@ -57,7 +56,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'workatolist.wsgi.application'
+WSGI_APPLICATION = 'workatolist.settings'
 
 
 # Database
