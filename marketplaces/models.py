@@ -4,23 +4,29 @@ from django.db import models
 
 # Create your models here.
 from django.utils.text import slugify
+from mptt.fields import TreeForeignKey
+from mptt.models import MPTTModel
 
 
 class NameSlugMixin(models.Model):
-    name = models.CharField('Category Name', max_length=255)
+    name = models.CharField(max_length=255)
     slug = models.SlugField()
+
+    class Meta:
+        abstract = True
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name.strip())
         super().save(*args, **kwargs)
 
-    class Meta:
-        abstract = True
 
-
-class Category(NameSlugMixin):
-    parent = models.ForeignKey('self', null=True)
+class Category(MPTTModel, NameSlugMixin):
+    parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     channel = models.ForeignKey('marketplaces.Channel', related_name='categories')
+
+    class Meta:
+        verbose_name = 'Category'
+        verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.slug
@@ -32,8 +38,9 @@ class Category(NameSlugMixin):
             categories = line.split('/')
             _parent = None
             for category in categories:
+                _category_name = category.strip()
                 _category, created = cls.objects.get_or_create(
-                    name=category,
+                    name=_category_name,
                     parent=_parent,
                     channel=_channel
                 )
@@ -51,6 +58,9 @@ class Category(NameSlugMixin):
             _category.delete()
 
 
-
 class Channel(NameSlugMixin):
     pass
+
+    class Meta:
+        verbose_name = 'Channel'
+        verbose_name_plural = 'Channels'
