@@ -2,7 +2,6 @@ from pprint import pprint
 
 from django.db import models
 
-# Create your models here.
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
@@ -24,12 +23,30 @@ class Category(MPTTModel, NameSlugMixin):
     parent = TreeForeignKey('self', null=True, blank=True, related_name='children', db_index=True)
     channel = models.ForeignKey('marketplaces.Channel', related_name='categories')
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name.strip())
+        if self.parent:
+            self.slug = '{0}-{1}'.format(self.parent.slug, self.slug)
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
 
+    class MPTTMeta:
+        level_attr = 'mptt_level'
+        order_insertion_by = ['name']
+
     def __str__(self):
         return self.slug
+
+    @property
+    def parents(self):
+        return self.get_ancestors().values_list('name', flat=True)
+
+    @property
+    def subcategories(self):
+        return self.get_children().values_list('name', flat=True)
 
     @classmethod
     def create_categories(cls, _channel, lines):
