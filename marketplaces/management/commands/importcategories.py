@@ -12,7 +12,7 @@ class Command(BaseCommand):
         file_name = options.get('file_name', None)
         channel = options.get('channel', None)
         _channel, _ = Channel.objects.get_or_create(name=channel)
-        old_categories = _channel.categories.all()
+        old_categories = _channel.categories.all().select_related('parent')
         try:
             with open(file_name) as file:
                 lines = file.read().splitlines()
