@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
+from mptt.templatetags.mptt_tags import cache_tree_children
 
 
 class NameSlugMixin(models.Model):
@@ -13,10 +14,6 @@ class NameSlugMixin(models.Model):
 
     class Meta:
         abstract = True
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name.strip())
-        super().save(*args, **kwargs)
 
 
 class Category(MPTTModel, NameSlugMixin):
@@ -42,11 +39,11 @@ class Category(MPTTModel, NameSlugMixin):
 
     @property
     def parents(self):
-        return self.get_ancestors().values_list('name', flat=True)
+        return self.get_ancestors().values('name', 'slug')
 
     @property
     def subcategories(self):
-        return self.get_children().values_list('name', flat=True)
+        return self.get_children().values('name', 'slug')
 
     @classmethod
     def create_categories(cls, _channel, lines):
@@ -74,10 +71,33 @@ class Category(MPTTModel, NameSlugMixin):
             pprint('Category {0} deleted'.format(_category.name))
             _category.delete()
 
+    @classmethod
+    def recursive_categories(cls, category):
+        result = {
+            'slug': category.slug,
+            'name': category.name,
+        }
+        children = [cls.recursive_categories(child) for child in category.get_children()]
+        if children:
+            result['sub-category'] = children
+        return result
+
 
 class Channel(NameSlugMixin):
-    pass
 
     class Meta:
         verbose_name = 'Channel'
         verbose_name_plural = 'Channels'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name.strip())
+        super().save(*args, **kwargs)
+
+    @property
+    def tree(self):
+        _categories = self.categories.all()
+        dict_child = cache_tree_children(_categories)
+        tree = []
+        for child in dict_child:
+            tree.append(Category.recursive_categories(child))
+        return tree
