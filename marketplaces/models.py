@@ -1,7 +1,6 @@
 from pprint import pprint
 
 from django.db import models
-
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
