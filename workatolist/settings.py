@@ -10,6 +10,9 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+ADMINS = [
+    ('Paulo', 'pvictorpessoa@hotmail.com')
+]
 
 DATABASES = {
     'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))
