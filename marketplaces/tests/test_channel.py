@@ -42,14 +42,39 @@ class ChannelListAPITest(ChannelBaseTest):
 class ChannelDetailAPITest(ChannelBaseTest):
     def setUp(self):
         super().setUp()
+        self.book = mommy.make(
+            'Category',
+            name='Books',
+            channel=self.channel
+        )
         self.url_detail = reverse('channel-detail', kwargs={'slug': self.channel.slug})
 
     def test_check_fields(self):
         response = self.client.get(self.url_detail)
         data = response.data
-        channel = self.channel
         self.assertIn('slug', data)
         self.assertIn('name', data)
         self.assertIn('categories', data)
+
+    def test_check_values_received(self):
+        response = self.client.get(self.url_detail)
+        data = response.data
+        channel = self.channel
         self.assertEqual(channel.slug, data.get('slug'))
         self.assertEqual(channel.name, data.get('name'))
+        self.assertEqual(channel.categories.all().count(), len(data.get('categories')))
+
+    def test_invalid_put_method(self):
+        data = {
+            'name': 'Walmart updated'
+        }
+        response = self.client.put(self.url_detail, data)
+        error_msg = response.data.get('detail')
+        self.assertEqual(405, response.status_code)
+        self.assertEqual('Method "PUT" not allowed.', error_msg)
+
+    def test_check_channel_categories(self):
+        response = self.client.get(self.url_detail)
+        data = response.data
+        for item in self.channel.categories.values('name', 'slug'):
+            self.assertIn(item, data.get('categories'))
