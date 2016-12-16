@@ -1,1 +1,2 @@
 -r requirements/local.txt
+model_mommy==1.3.1
