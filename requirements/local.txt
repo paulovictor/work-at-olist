@@ -1,1 +1,2 @@
 -r production.txt
+model_mommy==1.3.1
