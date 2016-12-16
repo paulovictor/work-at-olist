@@ -3,8 +3,7 @@ import os
 import dj_database_url
 from decouple import config
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 SECRET_KEY = config('SECRET_KEY', default='OLISTSECRETKEY')
 DEBUG = False
@@ -41,7 +40,6 @@ MIDDLEWARE_CLASSES = [
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware'
 ]
 
 
@@ -100,7 +98,6 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATIC_URL = '/static/'
 
 
@@ -110,4 +107,5 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 50
 }
 
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
