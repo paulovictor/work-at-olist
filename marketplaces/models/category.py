@@ -4,15 +4,8 @@ from django.db import models
 from django.utils.text import slugify
 from mptt.fields import TreeForeignKey
 from mptt.models import MPTTModel
-from mptt.templatetags.mptt_tags import cache_tree_children
 
-
-class NameSlugMixin(models.Model):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField()
-
-    class Meta:
-        abstract = True
+from marketplaces.models import NameSlugMixin
 
 
 class Category(MPTTModel, NameSlugMixin):
@@ -80,23 +73,3 @@ class Category(MPTTModel, NameSlugMixin):
         if children:
             result['sub-category'] = children
         return result
-
-
-class Channel(NameSlugMixin):
-
-    class Meta:
-        verbose_name = 'Channel'
-        verbose_name_plural = 'Channels'
-
-    def save(self, *args, **kwargs):
-        self.slug = slugify(self.name.strip())
-        super().save(*args, **kwargs)
-
-    @property
-    def tree(self):
-        _categories = self.categories.all()
-        dict_child = cache_tree_children(_categories)
-        tree = []
-        for child in dict_child:
-            tree.append(Category.recursive_categories(child))
-        return tree
