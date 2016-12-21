@@ -14,13 +14,13 @@ class ImportCategoriesCommandTestCase(TestCase):
         self.stderr = StringIO()
 
     def test_import_csv_file(self):
-        file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fixtures/categories.csv'))
+        file = os.path.abspath(os.path.join(os.path.dirname(__file__), '../fixtures/categories.csv'))
         call_command('importcategories', 'walmart', file),
 
         self.assertTrue(Channel.objects.exists())
         self.assertEqual(Category.objects.all().count(), 23)
 
     def test_format_error_when_import_doc_file(self):
-        file = os.path.abspath(os.path.join(os.path.dirname(__file__), 'fixtures/categories.doc'))
+        file = os.path.abspath(os.path.join(os.path.dirname(__file__), '../fixtures/categories.doc'))
         with self.assertRaises(FormatError):
             call_command('importcategories', 'walmart', file)
