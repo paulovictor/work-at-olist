@@ -147,3 +147,54 @@ $ python manage.py importcategories walmart categories.csv
 - Practice the [12 Factor-App] (http://12factor.net) concepts.
 - Make small and atomic commits, with clear messages (written in English).
 - Use good programming practices.
+
+
+
+## Installation on macOSX
+
+- Create the virtualenv
+```
+virtualenv --no-site-packages --python=python3 work-at-olist
+```
+
+- Move to the virtualenv folder
+```
+cd work-at-olist
+```
+- Active the virtualenv
+```
+source bin/activate
+```
+- Clone the git repository
+
+```
+git clone https://github.com/paulovictor/work-at-olist.git
+```
+- Move to the project folder
+```
+cd work-at-olist/
+```
+- Install the requirements
+```
+pip install -r requirements.txt
+```
+- Configure your local database on workatolist/settings.py
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'olist',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
+}
+```
+
+
+- at folder /work/work-at-olist/work-at-olist execute this commands
+```
+make migrate
+make run
+```
+
+- Now, access the http://127.0.0.1:8000/
